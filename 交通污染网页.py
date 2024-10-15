@@ -13,7 +13,7 @@ import shap
 import matplotlib.pyplot as plt
 
 # 加载模型
-file_path = r"C:/Users/18657/Desktop/人工智能/XGBoost.pkl"
+file_path = r"XGBoost2020.pkl"
 model = joblib.load(file_path)
 
 # 定义特征名称
@@ -58,31 +58,31 @@ if st.button("预测"):
     # 根据预测结果生成建议
     probability = predicted_proba[predicted_class] * 100
 
-    if predicted_class == 6:
+    if predicted_class == 5:
         advice = (
             f"根据我们的模型，该日空气质量为严重污染。"
             f"模型预测该日为严重污染的概率为 {probability:.1f}%。"
             "建议采取防护措施，减少户外活动。"
         )
-    elif predicted_class == 5:
+    elif predicted_class == 4:
         advice = (
             f"根据我们的模型，该日空气质量为重度污染。"
             f"模型预测该日为重度污染的概率为 {probability:.1f}%。"
             "建议减少外出，佩戴防护口罩。"
         )
-    elif predicted_class == 4:
+    elif predicted_class == 3:
         advice = (
             f"根据我们的模型，该日空气质量为中度污染。"
             f"模型预测该日为中度污染的概率为 {probability:.1f}%。"
             "敏感人群应减少户外活动。"
         )
-    elif predicted_class == 3:
+    elif predicted_class == 2:
         advice = (
             f"根据我们的模型，该日空气质量为轻度污染。"
             f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
             "可以适当进行户外活动，但仍需注意防护。"
         )
-    elif predicted_class == 2:
+    elif predicted_class == 1:
         advice = (
             f"根据我们的模型，该日空气质量为良。"
             f"模型预测该日空气质量为良的概率为 {probability:.1f}%。"
