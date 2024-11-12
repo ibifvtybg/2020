@@ -27,12 +27,22 @@ feature_names = ['CO', 'FSP', 'NO2', 'O3', 'RSP', 'SO2']
 # Streamlit 用户界面
 st.title("五角场监测站交通污染预测")
 
-# 输入特征
+# 一氧化碳浓度
 CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+
+# PM2.5浓度
 FSP = st.number_input("PM2.5的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+
+# 二氧化氮浓度
 NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+
+# 臭氧浓度
 O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+
+# PM10浓度
 RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+
+# 二氧化硫浓度
 SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
 # 处理输入并进行预测
@@ -94,19 +104,24 @@ if st.button("预测"):
             # 计算SHAP值并绘制shap瀑布图
             try:
                 explainer = shap.TreeExplainer(model)
-                shap_values = explainer.shap_values(features)
+                shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
+                shap_values_2d = np.squeeze(shap_values, axis=0)
+                st.write("SHAP values for the first class:")
+                st.write(shap_values[0, 0, :])
 
-                # 获取第一个样本的SHAP值
-                shap_values_sample = shap_values[0]
+                st.write("Shape of shap_values:", np.shape(shap_values_2d))
+                st.write("First few elements of shap_values:", shap_values_2d[:3])
 
-                # 创建SHAP解释对象
-                shap_exp = shap.Explanation(values=shap_values_sample, base_values=base_value, data=features[0], feature_names=feature_names)
-
-                # 绘制SHAP瀑布图
-                shap.plots.waterfall(shap_exp)
-                plt.savefig("shap_waterfall_plot.png", bbox_inches='tight', dpi=1200)
-                st.image("shap_waterfall_plot.png")
+                # 针对每个样本和每个类别分别绘制瀑布图
+                for sample_idx in range(shap_values_2d.shape[0]):
+                    for class_idx in range(shap_values_2d.shape[1]):
+                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                        shap.plots.waterfall(shap_exp)
+                        plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
+                        st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                else:
+                    st.write("无法计算 SHAP 值。")
             except Exception as e:
                 st.write(f"SHAP 值计算过程中出现错误：{e}")
         except Exception as e:
