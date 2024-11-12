@@ -58,7 +58,7 @@ if st.button("预测"):
 
             # 显示预测结果
             st.write(f"**预测类别：** {predicted_class}")
-            st.write(f"**预测概率：** {predicted_proba")
+            st.write(f"**预测概率：** {predicted_proba}")
 
             # 根据预测结果生成建议
             probability = predicted_proba[predicted_class] * 100
