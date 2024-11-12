@@ -58,7 +58,7 @@ if st.button("预测"):
 
             # 显示预测结果
             st.write(f"**预测类别：** {predicted_class}")
-            st.write(f"**预测概率：** {predicted_proba}")
+            st.write(f"**预测概率：** {predicted_proba")
 
             # 根据预测结果生成建议
             probability = predicted_proba[predicted_class] * 100
@@ -110,19 +110,13 @@ if st.button("预测"):
                 st.write("Shape of shap_values:", np.shape(shap_values))
                 st.write("First few elements of shap_values:", shap_values[:3])
 
-                # 完整输出shap_values以便检查
-                st.write("Full shap_values:")
-                st.write(shap_values)
-
-                if len(shap_values) > 0:
-                    # 调整shap_values维度为二维，取第一个维度的元素
-                    shap_values_2d = shap_values[0]
-
-                    for i in range(len(shap_values_2d)):
-                        shap_exp = shap.Explanation(shap_values_2d[i], base_value[0], data=pd.DataFrame([feature_values], columns=feature_names))
+                # 针对每个样本和每个类别分别绘制瀑布图
+                for sample_idx in range(shap_values.shape[0]):
+                    for class_idx in range(shap_values.shape[1]):
+                        shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
-                        plt.savefig(f"shap_waterfall_plot_{i}.png", bbox_inches='tight', dpi=1200)
-                        st.image(f"shap_waterfall_plot_{i}.png")
+                        plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
+                        st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                 else:
                     st.write("无法计算 SHAP 值。")
             except Exception as e:
