@@ -94,7 +94,7 @@ if st.button("预测"):
                 )
             else:
                 advice = (
-                    f"根据我们的模型，该日空气质量为优。"
+                    f"根据我们的的模型，该日空气质量为优。"
                     f"模型预测该日空气质量为优的概率为 {probability:.1f}%。"
                     "空气质量良好，尽情享受户外时光。"
                 )
@@ -111,8 +111,11 @@ if st.button("预测"):
                 st.write("First few elements of shap_values:", shap_values[:3])
 
                 if len(shap_values) > 0:
-                    for i in range(len(shap_values)):
-                        shap_exp = shap.Explanation(shap_values[i][0], base_value[i], data=pd.DataFrame([feature_values], columns=feature_names))
+                    # 调整shap_values维度为二维，取第一个维度的元素
+                    shap_values_2d = shap_values[0]
+
+                    for i in range(len(shap_values_2d)):
+                        shap_exp = shap.Explanation(shap_values_2d[i], base_value[0], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
                         plt.savefig(f"shap_waterfall_plot_{i}.png", bbox_inches='tight', dpi=1200)
                         st.image(f"shap_waterfall_plot_{i}.png")
@@ -123,4 +126,4 @@ if st.button("预测"):
         except Exception as e:
             st.write(f"预测过程中出现错误：{e}")
     else:
-        st.write("模型加载失败，无法进行预测。")
+    st.write("模型加载失败，无法进行预测。")
