@@ -78,8 +78,7 @@ if st.button("预测"):
             elif predicted_class == 3:
                 advice = (
                     f"根据我们的模型，该日空气质量为中度污染。"
-                    f"企业提供的代码，以便进一步排查问题。"
-                    "敏感人群应减少户外活动。"
+                    f"敏感人群应减少户外活动。"
                 )
             elif predicted_class == 2:
                 advice = (
@@ -105,21 +104,15 @@ if st.button("预测"):
             # 计算SHAP值并绘制shap瀑布图
             try:
                 explainer = shap.TreeExplainer(model)
-                # 打印模型相关信息以便排查
-                print("Model type:", type(model))
-                print("Model parameters:", model.get_params())
-
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
-                # 打印SHAP值相关信息以便排查
-                print("SHAP values type:", type(shap_values))
-                print("SHAP values:", shap_values)
-
                 base_value = explainer.expected_value
 
+                print("Shape of shap_values:", np.shape(shap_values))
+                print("First few elements of shap_values:", shap_values[:3])
+
                 if len(shap_values) > 0:
-                    # 绘制shap瀑布图，由于是六分类问题，需要一一对应每个类别
                     for i in range(len(shap_values)):
-                        shap_exp = shap.Explanation(shap_values[i], base_value[i], data=pd.DataFrame([feature_values], columns=feature_names))
+                        shap_exp = shap.Explanation(shap_values[i][0], base_value[i], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
                         plt.savefig(f"shap_waterfall_plot_{i}.png", bbox_inches='tight', dpi=1200)
                         st.image(f"shap_waterfall_plot_{i}.png")
