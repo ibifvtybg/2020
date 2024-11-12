@@ -28,22 +28,22 @@ feature_names = ['CO', 'FSP', 'NO2', 'O3', 'RSP', 'SO2']
 st.title("五角场监测站交通污染预测")
 
 # 一氧化碳浓度
-CO = st.number_input("一氧化碳的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
-# PM2.5 浓度
-FSP = st.number_input("PM2.5 的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+# PM2.5浓度
+FSP = st.number_input("PM2.5的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
 # 二氧化氮浓度
-NO2 = st.number_input("二氧化氮的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
 # 臭氧浓度
-O3 = st.number_input("臭氧的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
-# PM10 浓度
-RSP = st.number_input("PM10 的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+# PM10浓度
+RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
 # 二氧化硫浓度
-SO2 = st.number_input("二氧化硫的 24 小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
 
 # 处理输入并进行预测
 feature_values = [CO, FSP, NO2, O3, RSP, SO2]
@@ -102,25 +102,18 @@ if st.button("预测"):
 
             st.write(advice)
 
-            # 计算 SHAP 值并尝试不同的可视化方法
+            # 计算SHAP值并绘制shap瀑布图
             try:
                 explainer = shap.TreeExplainer(model)
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
+
                 if len(shap_values) > 0:
-                    try:
-                        # 尝试绘制力图
-                        shap.force_plot(base_value, shap_values[0], pd.DataFrame([feature_values], columns=feature_names))
-                        plt.savefig("shap_force_plot.png", bbox_inches='tight', dpi=1200)
-                        st.image("shap_force_plot.png")
-                    except IndexError:
-                        # 不再提示，直接尝试其他可视化方法
-                        try:
-                            shap.summary_plot(shap_values, pd.DataFrame([feature_values], columns=feature_names))
-                            plt.savefig("shap_summary_plot.png", bbox_inches='tight', dpi=1200)
-                            st.image("shap_summary_plot.png")
-                        except Exception as e:
-                            st.write(f"无法绘制 summary plot：{e}")
+                    # 绘制shap瀑布图，由于是六分类问题，需要一一对应每个类别
+                    for i in range(len(shap_values)):
+                        shap.plots.waterfall(base_value[i], shap_values[i], pd.DataFrame([feature_values], columns=feature_names))
+                        plt.savefig(f"shap_waterfall_plot_{i}.png", bbox_inches='tight', dpi=1200)
+                        st.image(f"shap_waterfall_plot_{i}.png")
                 else:
                     st.write("无法计算 SHAP 值。")
             except Exception as e:
