@@ -107,8 +107,8 @@ if st.button("预测"):
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
 
-                print("Shape of shap_values:", np.shape(shap_values))
-                print("First few elements of shap_values:", shap_values[:3])
+                st.write("Shape of shap_values:", np.shape(shap_values))
+                st.write("First few elements of shap_values:", shap_values[:3])
 
                 if len(shap_values) > 0:
                     for i in range(len(shap_values)):
