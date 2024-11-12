@@ -126,4 +126,4 @@ if st.button("预测"):
         except Exception as e:
             st.write(f"预测过程中出现错误：{e}")
     else:
-    st.write("模型加载失败，无法进行预测。")
+        st.write("模型加载失败，无法进行预测。")
