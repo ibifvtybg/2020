@@ -106,16 +106,17 @@ if st.button("预测"):
                 explainer = shap.TreeExplainer(model)
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
+                shap_values_2d = np.squeeze(shap_values, axis=0)
                 st.write("SHAP values for the first class:")
                 st.write(shap_values[0, 0, :])
 
-                st.write("Shape of shap_values:", np.shape(shap_values))
-                st.write("First few elements of shap_values:", shap_values[:3])
+                st.write("Shape of shap_values:", np.shape(shap_values_2d))
+                st.write("First few elements of shap_values:", shap_values_2d[:3])
 
                 # 针对每个样本和每个类别分别绘制瀑布图
-                for sample_idx in range(shap_values.shape[0]):
-                    for class_idx in range(shap_values.shape[1]):
-                        shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                for sample_idx in range(shap_values_2d.shape[0]):
+                    for class_idx in range(shap_values_2d.shape[1]):
+                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
                         plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                         st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
