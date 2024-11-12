@@ -106,6 +106,8 @@ if st.button("预测"):
                 explainer = shap.TreeExplainer(model)
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
+                st.write("SHAP values for the first class:")
+                st.write(shap_values[0, 0, :])
 
                 st.write("Shape of shap_values:", np.shape(shap_values))
                 st.write("First few elements of shap_values:", shap_values[:3])
