@@ -88,13 +88,13 @@ if st.button("预测"):
                 )
             elif predicted_class == 1:
                 advice = (
-                    f"根据我们的模型，该日空气质量为良。"
-                    f"模型预测该日空气质量为良的概率为 {probability:.1f}%。"
+                    f"根据我们的模型，此日空气质量为良。"
+                    f"模型预测此日空气质量为良的概率为 {probability:.1f}%。"
                     "可以正常进行户外活动。"
                 )
             else:
                 advice = (
-                    f"根据我们的的模型，该日空气质量为优。"
+                    f"根据我们的模型，该日空气质量为优。"
                     f"模型预测该日空气质量为优的概率为 {probability:.1f}%。"
                     "空气质量良好，尽情享受户外时光。"
                 )
@@ -109,6 +109,10 @@ if st.button("预测"):
 
                 st.write("Shape of shap_values:", np.shape(shap_values))
                 st.write("First few elements of shap_values:", shap_values[:3])
+
+                # 完整输出shap_values以便检查
+                st.write("Full shap_values:")
+                st.write(shap_values)
 
                 if len(shap_values) > 0:
                     # 调整shap_values维度为二维，取第一个维度的元素
