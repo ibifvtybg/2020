@@ -94,14 +94,14 @@ if st.button("预测"):
             # 计算SHAP值并绘制shap瀑布图
             try:
                 explainer = shap.TreeExplainer(model)
-                shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
+                shap_values = explainer.shap_values(features)
                 base_value = explainer.expected_value
 
-                # 获取第一个样本的第一个类别的SHAP值
-                shap_values_1d = shap_values[0, predicted_class]
+                # 获取第一个样本的SHAP值
+                shap_values_sample = shap_values[0]
 
                 # 创建SHAP解释对象
-                shap_exp = shap.Explanation(values=shap_values_1d, base_values=base_value[0], data=pd.DataFrame([feature_values], columns=feature_names))
+                shap_exp = shap.Explanation(values=shap_values_sample, base_values=base_value, data=features[0], feature_names=feature_names)
 
                 # 绘制SHAP瀑布图
                 shap.plots.waterfall(shap_exp)
