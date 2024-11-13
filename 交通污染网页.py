@@ -119,7 +119,7 @@ if st.button("预测"):
                 else:
                     advice = (
                         f"根据我们的库，该日空气质量为优。"
-                        f"模型预测该日空气质量为优的概率为 {probability:.1f}%。"
+                        f"模型预测该日空气质量为优的概率为 {probensity:.1f}%。"
                         "空气质量良好，尽情享受户外时光。"
                     )
 
@@ -166,6 +166,11 @@ if st.button("预测"):
                                 if shap_values_for_plot is None:
                                     st.error("在获取用于绘制瀑布图的SHAP值（多输出模型情况）时得到了None值，请检查模型或 数据！")
                                     raise ValueError("shap_values_for_plot不能为None。")
+                                else:
+                                    # 检查切片内每个元素是否为None
+                                    if any(value is None for value in shap_values_for_plot):
+                                        st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
+                                        raise ValueError("shap_values_for_plot元素不能为None。")
                                 shap_plot_values = shap.Explanation(
                                     values=shap_values_for_plot,
                                     data=pd.DataFrame([feature_values], columns=feature_names),
@@ -176,6 +181,11 @@ if st.button("预测"):
                                 if shap_values_for_plot is None:
                                     st.error("在获取用于绘制瀑布图的SHAP值（单输出模型情况）时得到了None值，请检查模型或数据！")
                                     raise ValueError("shap_values_for_plot不能为None。")
+                                else:
+                                    # 检查切片内每个元素是否为None
+                                    if any(value is None for value in shap_values_for_plot):
+                                        st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
+                                        raise ValueError("shap_values_for_plot元素不能为None。")
                                 shap_plot_values = shap.Explanation(
                                     values=shap_values_for_plot,
                                     data=pd.DataFrame([feature_values], columns=feature_names),
@@ -195,12 +205,23 @@ if st.button("预测"):
                                 feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not None else []
                             )
 
+                        # 检查data属性对应的DataFrame内是否有None值
+                        if shap_plot_values.data is not None:
+                            for col in shap_plot_values.data.columns:
+                                if any(shap_plot_values.data[col].isnull()):
+                                    st.error(f"shap_plot_values的data属性中{col}列存在None值，请检查模型或数据！")
+                                    raise ValueError(f"shap_plot_values的data属性中{col}列不能有None值。")
+
                         try:
                             shap.plots.waterfall(shap_plot_values)
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                        except TypeError as e:
+                            st.write(f"绘制瀑布图时发生类型错误：{e}")
+                        except ValueError as e:
+                            st.write(f"绘制瀑布图时发生值错误：{e}")
                         except Exception as e:
-                            st.write(f"绘制瀑布图过程中出现错误：{e}")
+                            st.write(f"绘制瀑布图过程中出现其他未分类错误：{e}")
                     else:
                         st.write("指定的类别索引超出范围，请检查预测类别值。")
                 except Exception as e:
