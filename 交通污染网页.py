@@ -189,12 +189,12 @@ def predict():
 
         # 获取用户输入并构建特征数组
         user_inputs = {
-            "CO": int(CO),
-            "FSP": int(FSP),
-            "NO2": int(NO2),
-            "O3": int(O3),
-            "RSP": int(RSP),
-            "SO2": int(SO2)
+            "CO": float(CO),
+            "FSP": float(FSP),
+            "NO2": float(NO2),
+            "O3": float(O3),
+            "RSP": float(RSP),
+            "SO2": float(SO2)
         }
 
         feature_values = [user_inputs[feature] for feature in model_input_features]
