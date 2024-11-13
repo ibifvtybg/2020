@@ -230,6 +230,10 @@ def predict():
         # 计算每个类别的特征贡献度
         importance_df = pd.DataFrame()
         for i in range(shap_values.shape[2]):  # 对每个类别进行计算
+        sliced_shap_values = shap_values[:, :, i]
+        if not isinstance(sliced_shap_values, np.ndarray) or sliced_shap_values.ndim!= 2:
+            st.write(f"<div style='color: red;'>切片后的SHAP值数据格式不符合预期，应为二维数组，当前类型为：{type(sliced_shap_values)}，维度为：{sliced_shap_values.ndim}</div>", unsafe_allow_html=True)
+            return
             importance = np.abs(shap_values[:, :, i]).mean(axis=0)
             importance_df[f'Class_{i}'] = importance
 
@@ -280,6 +284,8 @@ def predict():
 
         # 绘制瀑布图
         for i in range(len(contributions_sorted)):
+            if contributions_sorted[i] > 100 or contributions_sorted[i] < -100:
+                contributions_sorted[i] = np.clip(contributions_sorted[i], -100, 100)
             color = '#ff5050' if contributions_sorted[i] < 0 else '#66b3ff'  # 负贡献使用红色，正贡献使用蓝色
             if i == len(contributions_sorted) - 1:
                 # 最后一个条形带箭头效果，表示最终累积值
