@@ -218,8 +218,10 @@ def predict():
                     '良': f"建议：根据我们的库，此日空气质量为良。模型预测此日空气质量为良的概率为 {probability:.1f}%。可以正常进行户外活动。",
                     '优': f"建议：根据我们的库，该日空气质量为优。模型预测该日空气质量为优的概率为 {probability:.1f}%。空气质量良好，尽情享受户外时光。",
         }[category_mapping[predicted_class]]
-        result_text = f"预测概率：{probability_str}<br>{advice}"
-        st.markdown(f"<div class='advice-text'>{result_text}</div>", unsafe_allow_html=True)
+        
+        st.markdown(f"<div class='probability-result'>预测概率：{probability_str}</div>", unsafe_allow_html=True)
+        
+        st.markdown(f"<div class='advice-text'>{advice}</div>", unsafe_allow_html=True)
 
         # 计算 SHAP 值
         explainer = shap.TreeExplainer(model)
