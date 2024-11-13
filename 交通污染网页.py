@@ -32,7 +32,6 @@ st.markdown("""
         font-weight: bold;
         text-align: center;
         margin-bottom: 30px;
-        text-shadow: 3px 3px 10px #0056b3;
     }
    .subheader {
         font-size: 28px;
