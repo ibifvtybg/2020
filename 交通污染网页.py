@@ -122,6 +122,12 @@ if st.button("预测"):
                     if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
                         sample_idx = 0
                         class_idx = predicted_class 
+                        st.write("shap_value_param type:", type(shap_value_param))
+                        st.write("shap_value_param value:", shap_value_param)
+                        st.write("base_value_param type:", type(base_value_param))
+                        st.write("base_value_param value:", base_value_param)
+                        st.write("data_param type:", type(data_param))
+                        st.write("data_param value:", data_param)
 
                         # 根据错误提示修改这里，确保传递给waterfall函数的是符合要求的参数
                         shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx],base_value[sample_idx],data=pd.DataFrame([feature_values], columns=feature_names))
