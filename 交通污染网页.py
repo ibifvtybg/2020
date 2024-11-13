@@ -110,17 +110,8 @@ if st.button("预测"):
                     shap_values_2d = np.squeeze(shap_values, axis=0)
                     st.write("Shape of shap_values_2d:", np.shape(shap_values_2d))
 
-                    # 确保索引在有效范围内，这里假设你是想获取第predicted_class行第0列的数据
-                    if predicted_class < shap_values_2d.shape[0]:
-                        shap_values_1d = shap_values_2d[predicted_class, 0]
-                    else:
-                        st.write(f"预测类别索引超出shap_values_2d范围，请检查相关数据。")
-                    raise ValueError("预测类别索引超出范围")
-
                     st.write("SHAP values for the first class:")
                     st.write(shap_values[0, 0, :])
-
-                    st.write(shap_values_1d)
 
                     st.write("Shape of shap_values:", np.shape(shap_values_2d))
                     st.write("First few elements of shap_values:", shap_values_2d[:3])
@@ -129,11 +120,11 @@ if st.button("预测"):
                     base_value = explainer.expected_value
 
                     # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
-                    if 0 <= predicted_class < shap_values.shape[1] - 1:
+                    if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
                         sample_idx = 0
                         class_idx = predicted_class 
 
-                        shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
                         try:
                             shap.plots.waterfall(shap_exp)
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
