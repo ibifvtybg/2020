@@ -25,7 +25,7 @@ if isinstance(model, xgb.XGBClassifier):
 feature_names = ["CO", "FSP", "NO2", "O3", "RSP", "SO2"]
 
 # Streamlit 用户界面
-st.title("五角场监测站交通污染预测")
+st.title("虹口监测站交通污染预测")
 
 # 一氧化碳浓度
 CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
