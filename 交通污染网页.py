@@ -65,36 +65,36 @@ if st.button("预测"):
 
             if predicted_class == 5:
                 advice = (
-                    f"根据我们的模型，该日空气质量为严重污染。"
+                    f"根据我们的库，该日空气质量为严重污染。"
                     f"模型预测该日为严重污染的概率为 {probability:.1f}%。"
                     "建议采取防护措施，减少户外活动。"
                 )
             elif predicted_class == 4:
                 advice = (
-                    f"根据我们的模型，该日空气质量为重度污染。"
+                    f"根据我们的库，该日空气质量为重度污染。"
                     f"模型预测该日为重度污染的概率为 {probability:.1f}%。"
                     "建议减少外出，佩戴防护口罩。"
                 )
             elif predicted_class == 3:
                 advice = (
-                    f"根据我们的模型，该日空气质量为中度污染。"
+                    f"根据我们的库，该日空气质量为中度污染。"
                     f"敏感人群应减少户外活动。"
                 )
             elif predicted_class == 2:
                 advice = (
-                    f"根据我们的模型，该日空气质量为轻度污染。"
+                    f"根据我们的库，该日空气质量为轻度污染。"
                     f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
                     "可以适当进行户外活动，但仍需注意防护。"
                 )
             elif predicted_class == 1:
                 advice = (
-                    f"根据我们的模型，此日空气质量为良。"
+                    f"根据我们的库，此日空气质量为良。"
                     f"模型预测此日空气质量为良的概率为 {probability:.1f}%。"
                     "可以正常进行户外活动。"
                 )
             else:
                 advice = (
-                    f"根据我们的模型，该日空气质量为优。"
+                    f"根据我们的库，该日空气质量为优。"
                     f"模型预测该日空气质量为优的概率为 {probability:.1f}%。"
                     "空气质量良好，尽情享受户外时光。"
                 )
@@ -122,15 +122,20 @@ if st.button("预测"):
                 st.write("Shape of shap_values:", np.shape(shap_values_2d))
                 st.write("First few elements of shap_values:", shap_values_2d[:3])
 
+                # 获取base_value
                 base_value = explainer.expected_value
 
-                # 针对每个样本和每个类别分别绘制瀑布图
-                for sample_idx in range(shap_values.shape[0]):
-                    for class_idx in range(shap_values.shape[1]):
-                        shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
-                        shap.plots.waterfall(shap_exp)
-                        plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
-                        st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
+                if 0 <= predicted_class < shap_values.shape[1] - 1:
+                    sample_idx = 0
+                    class_idx = predicted_class + 1
+
+                    shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                    shap.plots.waterfall(shap_exp)
+                    plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
+                    st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                else:
+                    st.write("指定的类别索引超出范围，请检查预测类别值。")
                 else:
                     st.write("无法计算 SHAP 值。")
             except Exception as e:
