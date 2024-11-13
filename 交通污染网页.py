@@ -82,11 +82,11 @@ if st.button("预测"):
                         f"敏感人群应减少户外活动。"
                     )
                 elif predicted_class == 2:
-                advice = (
-                    f"根据我们的库，该日空气质量为轻度污染。"
-                    f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
-                    "可以适当进行户外活动，但仍需注意防护。"
-                )
+                    advice = (
+                        f"根据我们的库，该日空气质量为轻度污染。"
+                        f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
+                        "可以适当进行户外活动，但仍需注意防护。"
+                    )
                 elif predicted_class == 1:
                     advice = (
                         f"根据我们的库，此日空气质量为良。"
