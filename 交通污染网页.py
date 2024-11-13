@@ -14,7 +14,7 @@ import xgboost as xgb
 import matplotlib.pyplot as plt
 
 # 加载模型
-file_path = r"2020XGBoost.pkl"
+file_path = r"XGBoost2020.pkl"
 model = joblib.load(file_path)
 
 if isinstance(model, xgb.XGBClassifier):
