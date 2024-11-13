@@ -115,6 +115,9 @@ st.markdown("""
 
 st.markdown("<div class='main'>", unsafe_allow_html=True)
 
+# 页面标题
+st.markdown('<div class="title">五角场监测站交通污染预测</div>', unsafe_allow_html=True)
+
 # 加载模型
 file_path = r"XGBoost2020.pkl"
 model = joblib.load(file_path)
@@ -130,7 +133,7 @@ feature_names = ["CO", "FSP", "NO2", "O3", "RSP", "SO2"]
 category_mapping = {
     5: '严重污染',
     4: '重度污染',
-    3: '中度污染',
+    3: '重度污染',
     2: '轻度污染',
     1: '良',
     0: '优'
@@ -153,13 +156,16 @@ if FSP is None:
 
 # 二氧化氮浓度
 NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
-                    help="请输入该监测站检测到的二氧化氮在24小时内的平均浓度值，单位为毫克每立方米。")
+                    help="请输入该监测站检测到的二氧化氮在24小时内的可平均浓度值，单位为毫克每立方米。")
 if NO2 is None:
     st.warning("二氧化氮浓度输入为空，已将其从本次预测数据中删除。")
     NO2 = 0.0
 
 # 臭氧浓度
 O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+                    help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
+if O3 is None:
+    st.warning("臭氧浓度输入为空，已将其从本次预测DataFrame([], columns=feature_names)
                     help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
 if O3 is None:
     st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。")
@@ -240,73 +246,64 @@ if st.button("预测"):
                         st.error("计算得到的base_value为None，请检查模型或数据！")
                         raise ValueError("base_value不能为None。")
 
-                    # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
-                    if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
-                        sample_idx = 0
-                        class_idx = predicted_class 
-                        shap_value_param = shap_values_2d[sample_idx][class_idx]
-                        base_value_param = base_value[sample_idx]
-                        data_param = pd.DataFrame([feature_values], columns=feature_names)
-                        shap_value_param = np.array([shap_value_param])
+                    # 准备绘制瀑布图的数据
+                    feature_name_mapping = {
+                        "CO": "一氧化碳浓度",
+                        "FSP": "PM2.5浓度",
+                        "NO2": "二氧化氮浓度",
+                        "O3": "臭氧浓度",
+                        "RSP": "PM10浓度",
+                        "SO2": "二氧化硫浓度"
+                    }
+                    features = [feature_name_mapping[f] for f in shap_values_2d.columns.tolist()]  # 获取特征名称
+                    contributions = shap_values_2d[predicted_class].values  # 获取特征贡献度
 
-                        # 根据模型类型确定用于绘制瀑布图的SHAP值及创建正确的Explanation对象
-                        if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
-                            # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_）
-                            if model.n_classes_ > 1:
-                                shap_values_for_plot = shap_values[0, 0]
-                                shap_values_for_plot = _recursive_remove_none(shap_values_for_plot)
-                                shap_plot_values = shap.Explanation(
-                                    values=shap_values_for_plot,
-                                    data=pd.DataFrame([feature_values], columns=feature_names),
-                                    feature_names=feature_names
-                                )
-                            else:
-                                shap_values_for_plot = shap_values[0]
-                                shap_values_for_plot = _recursive_remove_none(shap_values_for_plot)
-                                shap_plot_values = shap.Explanation(
-                                    values=shap_values_for_plot,
-                                    data=pd.DataFrame([feature_values], columns=feature_names),
-                                    feature_names=feature_names
-                                )
+                    # 确保瀑布图的数据是按贡献度绝对值降序排列的
+                    sorted_indices = np.argsort(np.abs(contributions))[::-1]
+                    features_sorted = [features[i] for i in sorted_indices]
+                    contributions_sorted = contributions[sorted_indices]
+
+                    # 初始化绘图
+                    fig, ax = plt.subplots(figsize=(14, 8))
+
+                    # 初始化累积值
+                    start = 0
+                    prev_contributions = [start]  # 起始值为0
+
+                    # 计算每一步的累积值
+                    for i in range(1, len(contributions_sorted)):
+                        prev_contributions.append(prev_contributions[-1] + contributions_sorted[i - 1])
+
+                    # 绘制瀑布图
+                    for i in range(len(contributions_sorted)):
+                        color = '#ff5050' if contributions_sorted[i] < 0 else '#66b3ff'  # 负贡献使用红色，正贡献使用蓝色
+                        if i == len(contributions_sorted) - 1:
+                            # 最后一个条形带箭头效果，表示最终累积值
+                            ax.barh(features_sorted[i], contributions_sorted[i], left=prev_contributions[i], color=color, edgecolor='black', height=0.5, hatch='/')
                         else:
-                            shap_plot_values = shap_exp
-                            if shap_exp is None:
-                                st.error("shap_exp未定义，请检查相关代码！")
-                            elif not isinstance(shap_exp, shap.Explanation):
-                                raise ValueError("shap_exp is not a  valid shap.Explanation object!")
+                            ax.barh(features_sorted[i], contributions_sorted[i], left=prev_contributions[i], color=color, edgecolor='black', height=0.5)
 
-                        # 检查并删除shap_plot_values中可能存在的None值
-                        if shap_plot_values is not None:
-                            shap_plot_values = shap.Explanation(
-                                values=[value for value in shap_plot_values.values if value is not None],
-                                data=shap_plot_values.data if shap_plot_values.data is not None else pd.DataFrame([], columns=feature_names),
-                                feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not None else []
-                            )
-                            shap_plot_values = _recursive_remove_none(shap_plot_values)
-                            st.write("shap_plot_values after recursive None value removal:", shap_plot_values)
+                        # 在每个条形上显示数值
+                        plt.text(prev_contributions[i] + contributions_sorted[i] / 2, i, f"{contributions_sorted[i]:.2f}", 
+                                ha='center', va='center', fontsize=10, fontproperties=font_prop, color='black')
 
-                        # 检查data属性对应的DataFrame内是否有None值
-                        if shap_plot_values.data is not None:
-                            for col in shap_plot_values.data.columns:
-                                if any(shap_plot_values.data[col].isnull()):
-                                    st.error(f"shap_plot_values的data属性中{col}列存在None值，请检查模型或数据！")
-                                    raise ValueError(f"shap_plot_values的data属性中{col}列不能有None值。")
+                    # 设置图表属性
+                    plt.title(f'{category_mapping[predicted_class]} 的特征贡献度瀑布图', fontsize=18, fontproperties=font_prop)
+                    plt.xlabel('贡献度 (SHAP值)', fontsize=14, fontproperties=font_prop)
+                    plt.ylabel('特征', fontsize=14, fontproperties=font_prop)
+                    plt.yticks(fontsize=12, fontproperties=font_prop)
+                    plt.xticks(fontsize=12, fontproperties=font_prop)
+                    plt.grid(axis='x', linestyle='--', alpha=0.7)
 
-                        try:
-                            shap.plots.waterfall(shap_plot_values)
-                            plt.savefig("shap_waterfall_plot.png", bbox_inches='tight', dpi=1200)
-                            st.image("shap_waterfall_plot.png")
-                        except TypeError as e:
-                            st.error(f"绘制瀑布图时发生类型错误：{e}")
-                            raise
-                        except ValueError as e:
-                            st.error(f"绘制瀑布图时发生值错误：{e}")
-                            raise
-                        except Exception as e:
-                            st.error(f"绘制瀑布图过程中出现其他未分类错误：{e}")
-                            raise
-                    else:
-                        st.write("指定的类别索引超出范围，请检查预测类别值。")
+                    # 增加边距避免裁剪
+                    plt.xlim(left=0, right=max(prev_contributions) + max(contributions_sorted) * 1.0)
+                    fig.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.15)
+
+                    plt.tight_layout()
+
+                    # 保存并在 Streamlit 中展示
+                    plt.savefig("shap_waterfall_plot.png", bbox_inches='tight', dpi=1200)
+                    st.image("shap_waterfall_plot.png")
                 except Exception as e:
                     st.error(f"SHAP值计算过程中出现错误：{e}")
                     raise
