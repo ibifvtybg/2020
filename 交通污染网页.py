@@ -165,7 +165,7 @@ if NO2 is None:
 O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
                     help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
 if O3 is None:
-    st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。")
+    st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。", min_value=0.0, value=0.0,
                     help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
 if O3 is None:
     st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。")
