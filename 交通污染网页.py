@@ -190,7 +190,7 @@ if st.button("预测"):
                         if shap_plot_values is not None:
                             shap_plot_values = shap.Explanation(
                                 values=[value for value in shap_plot_values.values if value is not None],
-                                data=shap_plot_values.data if shap_plot_values.data is not  - 1:
+                                data = shap_plot_values.data if shap_plot_values.data is not None else pd.DataFrame([], columns=feature_names)
                                 sample_idx = 0
                                 class_idx = predicted_class 
                                 shap_value_param = shap_values_2d[sample_idx][class_idx]
