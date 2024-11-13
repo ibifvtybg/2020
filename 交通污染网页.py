@@ -59,7 +59,7 @@ if st.button("预测"):
 
                 # 显示预测结果
                 st.write(f"**预测类别：** {predicted_class}")
-                st.write(f"**预测概率：** {predicted_proba}")
+                st.write(f"**预测概率：** {predicted_proba")
 
                 # 根据预测结果生成建议
                 probability = predicted_proba[predicted_class] * 100
@@ -127,22 +127,28 @@ if st.button("预测"):
                         data_param = pd.DataFrame([feature_values], columns=feature_names)
                         shap_value_param = np.array([shap_value_param])
 
-                        # 创建SHAP解释对象，不再显式传递base_value参数
-                        shap_exp = shap.Explanation(
-                            values=shap_value_param,
-                            data=data_param,
-                            feature_names=feature_names
-                        )
-
-                        # 根据模型类型确定用于绘制瀑布图的SHAP值
+                        # 根据模型类型确定用于绘制瀑布图的SHAP值及创建正确的Explanation对象
                         if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
                             # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_）
                             if model.n_classes_ > 1:
-                                shap_plot_values = shap_values[0, 0]
+                                shap_values_for_plot = shap_values[0, 0]
+                                shap_plot_values = shap.Explanation(
+                                    values=shap_values_for_plot,
+                                    data=pd.DataFrame([feature_values], columns=feature_names),
+                                    feature_names=feature_names
+                                )
                             else:
-                                shap_plot_values = shap_values[0]
+                                shap_values_for_plot = shap_values[0]
+                                shap_plot_values = shap.Explanation(
+                                    values=shap_values_for_plot,
+                                    data=pd.DataFrame([feature_values], columns=feature_names),
+                                    feature_names=feature_names
+                                )
                         else:
                             shap_plot_values = shap_exp
+                            # 这里可以添加一些检查确保shap_exp的有效性，比如
+                            if not isinstance(shap_exp, shap.Explanation):
+                                raise ValueError("shap_exp is not a valid shap.Explanation object!")
 
                         try:
                             shap.plots.waterfall(shap_plot_values)
