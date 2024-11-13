@@ -123,9 +123,9 @@ if st.button("预测"):
                 st.write("First few elements of shap_values:", shap_values_2d[:3])
 
                 # 针对每个样本和每个类别分别绘制瀑布图
-                for sample_idx in range(shap_values_1d.shape[0]):
-                    for class_idx in range(shap_values_1d.shape[1]):
-                        shap_exp = shap.Explanation(shap_values_1d[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                for sample_idx in range(shap_values.shape[0]):
+                    for class_idx in range(shap_values.shape[1]):
+                        shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
                         plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                         st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
