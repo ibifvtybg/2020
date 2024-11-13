@@ -11,7 +11,7 @@ import xgboost as xgb
 
 # 设置中文字体
 font_path = "SimHei.ttf"
-font_prop = FontProperties(fname=font_path)
+font_prop = FontProperties(fname=font_path, size=20)
 
 # 确保matplotlib使用指定的字体
 plt.rcParams['font.sans-serif'] = [font_prop.get_name()]
