@@ -125,15 +125,10 @@ if st.button("预测"):
                         shap_value_param = shap_values_2d[sample_idx][class_idx]
                         base_value_param = base_value[sample_idx]
                         data_param = pd.DataFrame([feature_values], columns=feature_names)
-                        st.write("shap_value_param type:", type(shap_value_param))
-                        st.write("shap_value_param value:", shap_value_param)
-                        st.write("base_value_param type:", type(base_value_param))
-                        st.write("base_value_param value:", base_value_param)
-                        st.write("data_param type:", type(data_param))
-                        st.write("data_param value:", data_param)
+                        shap_value_param = np.array([shap_value_param])
 
                         # 根据错误提示修改这里，确保传递给waterfall函数的是符合要求的参数
-                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx],base_value[sample_idx],data=pd.DataFrame([feature_values], columns=feature_names))
+                        shap_exp = shap.Explanation(shap_value_param,base_value=base_value_param,data=data_param)
                         if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
                             # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_属性来大致判断）
                             if model.n_classes_ > 1:
