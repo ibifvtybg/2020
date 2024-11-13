@@ -225,6 +225,7 @@ def predict():
         # 计算 SHAP 值
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(features_array)
+        shap_values = shap_values.astype(np.float32)
 
         # 计算每个类别的特征贡献度
         importance_df = pd.DataFrame()
