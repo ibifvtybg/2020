@@ -212,4 +212,107 @@ def predict():
         probability = predicted_proba[predicted_class] * 100
         advice = {
                     '严重污染': f"根据我们的库，该日空气质量为严重污染。模型预测该日为严重污染的概率为 {probability:.1f}%。建议采取防护措施，减少户外活动。",
-                    '重度污染': f"根据我们的库，该日空气质量为重度污染。模型预测该日为重度污染
+                    '重度污染': f"根据我们的库，该日空气质量为重度污染。模型预测该日为重度污染的概率为 {probability:.1f}%。建议减少外出，佩戴防护口罩。",
+                    '中度污染': f"根据我们的库，该日空气质量为中度污染。模型预测该日为中度污染的概率为 {probability:.1f}%。敏感人群应减少户外活动。",
+                    '轻度污染': f"根据我们的库，该日空气质量为轻度污染。模型预测该日为轻度污染的概率为 {probability:.1f}%。可以适当进行户外活动，但仍需注意防护。",
+                    '良': f"根据我们的库，此日空气质量为良。模型预测此日空气质量为良的概率为 {probability:.1f}%。可以正常进行户外活动。",
+                    '优': f"根据我们的库，该日空气质量为优。模型预测该日空气质量为优的概率为 {probability:.1f}%。空气质量良好，尽情享受户外时光。",
+        }[category_mapping[predicted_class]]
+        st.markdown(f"<div class='advice-text'>{advice}</div>", unsafe_allow_html=True)
+
+        # 计算 SHAP 值
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer.shap_values(features_array)
+
+        # 计算每个类别的特征贡献度
+        importance_df = pd.DataFrame()
+        for i in range(shap_values.shape[2]):  # 对每个类别进行计算
+            importance = np.abs(shap_values[:, :, i]).mean(axis=0)
+            importance_df[f'Class_{i}'] = importance
+
+        importance_df.index = model_input_features
+
+        # 类别映射
+        type_mapping = {
+             5: '严重污染',
+             4: '重度污染',
+             3: '重度污染',
+             2: '轻度污染',
+             1: '良',
+             0: '优'
+        }
+        importance_df.columns = [type_mapping[i] for i in range(importance_df.shape[1])]
+
+        # 获取指定类别的 SHAP 值贡献度
+        predicted_class_name = category_mapping[predicted_class]  # 根据预测类别获取类别名称
+        importances = importance_df[predicted_class_name]  # 提取 importance_df 中对应的类别列
+
+        # 准备绘制瀑布图的数据
+        feature_name_mapping = {
+            "CO": "一氧化碳浓度",
+            "FSP": "PM2.5浓度",
+            "NO2": "二氧化氮浓度",
+            "O3": "臭氧浓度",
+            "RSP": "PM10浓度",
+            "SO2": "二氧化硫浓度"
+        }
+        features = [feature_name_mapping[f] for f in importances.index.tolist()]  # 获取特征名称
+        contributions = importances.values  # 获取特征贡献度
+
+        # 确保瀑布图的数据是按贡献度绝对值降序排列的
+        sorted_indices = np.argsort(np.abs(contributions))[::-1]
+        features_sorted = [features[i] for i in sorted_indices]
+        contributions_sorted = contributions[sorted_indices]
+
+        # 初始化绘图
+        fig, ax = plt.subplots(figsize=(14, 8))
+
+        # 初始化累积值
+        start = 0
+        prev_contributions = [start]  # 起始值为0
+
+        # 计算每一步的累积值
+        for i in range(1, len(contributions_sorted)):
+            prev_contributions.append(prev_contributions[-1] + contributions_sorted[i - 1])
+
+        # 绘制瀑布图
+        for i in range(len(contributions_sorted)):
+            color = '#ff5050' if contributions_sorted[i] < 0 else '#66b3ff'  # 负贡献使用红色，正贡献使用蓝色
+            if i == len(contributions_sorted) - 1:
+                # 最后一个条形带箭头效果，表示最终累积值
+                ax.barh(features_sorted[i], contributions_sorted[i], left=prev_contributions[i], color=color, edgecolor='black', height=0.5, hatch='/')
+            else:
+                ax.barh(features_sorted[i], contributions_sorted[i], left=prev_contributions[i], color=color, edgecolor='black', height=0.5)
+
+            # 在每个条形上显示数值
+            plt.text(prev_contributions[i] + contributions_sorted[i] / 2, i, f"{contributions_sorted[i]:.2f}", 
+                    ha='center', va='center', fontsize=10, fontproperties=font_prop, color='black')
+
+        # 设置图表属性
+        plt.title(f'{predicted_class_name} 的特征贡献度瀑布图', fontsize=18, fontproperties=font_prop)
+        plt.xlabel('贡献度 (SHAP 值)', fontsize=14, fontproperties=font_prop)
+        plt.ylabel('特征', fontsize=14, fontproperties=font_prop)
+        plt.yticks(fontsize=12, fontproperties=font_prop)
+        plt.xticks(fontsize=12, fontproperties=font_prop)
+        plt.grid(axis='x', linestyle='--', alpha=0.7)
+
+        # 增加边距避免裁剪
+        plt.xlim(left=0, right=max(prev_contributions) + max(contributions_sorted) * 1.0)
+        fig.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.15)
+
+        plt.tight_layout()
+
+        # 保存并在 Streamlit 中展示
+        plt.savefig("shap_waterfall_plot.png", bbox_inches='tight', dpi=1200)
+        st.image("shap_waterfall_plot.png")
+
+    except Exception as e:
+        st.write(f"<div style='color: red;'>Error in prediction: {e}</div>", unsafe_allow_html=True)
+
+if st.button("预测", key="predict_button"):
+    predict()
+
+# 页脚
+st.markdown('<div class="footer">© 2024 All rights reserved.</div>', unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)改为以蓝色为主题颜色
