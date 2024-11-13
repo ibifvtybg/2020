@@ -315,4 +315,4 @@ if st.button("预测", key="predict_button"):
 # 页脚
 st.markdown('<div class="footer">© 2024 All rights reserved.</div>', unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)改为以蓝色为主题颜色
+st.markdown("</div>", unsafe_allow_html=True)
