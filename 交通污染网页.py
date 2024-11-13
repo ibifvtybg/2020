@@ -105,11 +105,15 @@ if st.button("预测"):
             try:
                 explainer = shap.TreeExplainer(model)
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
-                base_value = explainer.expected_value
                 shap_values_2d = np.squeeze(shap_values, axis=0)
-                shap_values_1d = shap_values_2d[predicted_class, 0]
-                st.write("Shape of shap_values_2d:", np.shape(shap_values_2d))
-                st.write("Value of predicted_class:", predicted_class)
+
+                # 确保索引在有效范围内，这里假设你是想获取第predicted_class行第0列的数据
+                if predicted_class < shap_values_2d.shape[0]:
+                    shap_values_1d = shap_values_2d[predicted_class, 0]
+                else:
+                    st.write(f"预测类别索引超出shap_values_2d范围，请检查相关数据。")
+                    raise ValueError("预测类别索引超出范围")
+
                 st.write("SHAP values for the first class:")
                 st.write(shap_values[0, 0, :])
 
