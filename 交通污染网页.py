@@ -29,21 +29,39 @@ st.title("五角场监测站交通污染预测")
 
 # 一氧化碳浓度
 CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+if CO is None:
+    st.warning("一氧化碳浓度输入为空，已将其从本次预测数据中删除。")
+    CO = 0.0
 
 # PM2.5浓度
 FSP = st.number_input("PM2.5的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+if FSP is None:
+    st.warning("PM2.5浓度输入为空，已将其从本次预测数据中删除。")
+    FSP = 0.0
 
 # 二氧化氮浓度
 NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+if NO2 is None:
+    st.warning("二氧化氮浓度输入为空，已将其从本次预测数据中删除。")
+    NO2 = 0.0
 
 # 臭氧浓度
 O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+if O3 is None:
+    st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。")
+    O3 = 0.0
 
 # PM10浓度
-RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0.0,  value=0.0)
+if RSP is None:
+    st.warning("PM10浓度输入为空，已将其从本次预测数据中删除。")
+    RSP = 0.0
 
 # 二氧化硫浓度
 SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0)
+if SO2 is None:
+    st.warning("二氧化硫浓度输入为空，已将其从本次预测数据中删除。")
+    SO2 = 0.0
 
 # 处理输入并进行预测
 feature_values = [CO, FSP, NO2, O3, RSP, SO2]
@@ -106,6 +124,11 @@ if st.button("预测"):
                 try:
                     explainer = shap.TreeExplainer(model)
                     shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
+
+                    # 检查并删除shap_values中可能存在的None值
+                    if shap_values is not None:
+                        shap_values = np.array([value for value in shap_values if value is not None])
+
                     st.write("Shape of shap_values:", np.shape(shap_values))
                     shap_values_2d = np.squeeze(shap_values, axis=0)
                     st.write("Shape of shap_values_2d:", np.shape(shap_values_2d))
@@ -148,7 +171,15 @@ if st.button("预测"):
                             shap_plot_values = shap_exp
                             # 这里可以添加一些检查确保shap_exp的有效性，比如
                             if not isinstance(shap_exp, shap.Explanation):
-                                raise ValueError("shap_exp is not a valid shap.Explanation object!")
+                                raise ValueError("shap_exp is not a  valid shap.Explanation object!")
+
+                        # 检查并删除shap_plot_values中可能存在的None值
+                        if shap_plot_values is not None:
+                            shap_plot_values = shap.Explanation(
+                                values=[value for value in shap_plot_values.values if value is not None],
+                                data=shap_plot_values.data if shap_plot_values.data is not None else pd.DataFrame([], columns=feature_names),
+                                feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not None else []
+                            )
 
                         try:
                             shap.plots.waterfall(shap_plot_values)
