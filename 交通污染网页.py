@@ -291,11 +291,11 @@ def predict():
                     ha='center', va='center', fontsize=10, fontproperties=font_prop, color='black')
             
         # 设置图表属性
-        plt.title(f'预测类型为{predicted_class_name}时的特征贡献度瀑布图', fontsize=20, fontproperties=font_prop)
+        plt.title(f'预测类型为{predicted_class_name}时的特征贡献度瀑布图', size = 20)
         plt.xlabel('贡献度 (SHAP 值)', fontsize=20, fontproperties=font_prop)
         plt.ylabel('特征', fontsize=20, fontproperties=font_prop)
-        plt.yticks(fontsize=16, fontproperties=font_prop)
-        plt.xticks(fontsize=16, fontproperties=font_prop)
+        plt.yticks(size = 20)
+        plt.xticks(size = 20)
         plt.grid(axis='x', linestyle='--', alpha=0.7)
 
         # 增加边距避免裁剪
