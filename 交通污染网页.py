@@ -220,7 +220,7 @@ if st.button("预测"):
                                 class_idx = predicted_class 
                                 shap_value_param = shap_values_2d[sample_idx][class_idx]
                                 base_value_param = base_value[sample_idx]
-                                data_param = pd.DataFrame([feature_values], columns=file:///C:/Users/18657/Desktop/%E4%BA%94%E8%A7%92%E5%9C%BA%E7%9B%91%E6%B5%8B%E7%AB%99%E4%BA%A4%E9%80%9A%E6%B1%A1%E6%9D%82%E9%85%8D%E6%9C%89None值，请检查模型或数据！")
+                                data_param = pd.DataFrame([feature_values], columns=feature_names)
                                             raise ValueError("shap_values_for_plot不能为None。")
                                         shap_plot_values = shap.Explanation(
                                             values=shap_values_for_plot,
