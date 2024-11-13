@@ -107,7 +107,7 @@ if st.button("预测"):
                 shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
                 base_value = explainer.expected_value
                 shap_values_2d = np.squeeze(shap_values, axis=0)
-                shap_values_1d = shap_values_2d[predicted_class]
+                shap_values_1d = shap_values_2d[predicted_class, 0]
                 st.write("Shape of shap_values_2d:", np.shape(shap_values_2d))
                 st.write("Value of predicted_class:", predicted_class)
                 st.write("SHAP values for the first class:")
