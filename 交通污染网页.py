@@ -117,6 +117,8 @@ if st.button("预测"):
                 st.write("SHAP values for the first class:")
                 st.write(shap_values[0, 0, :])
 
+                st.write(shap_values_1d)
+
                 st.write("Shape of shap_values:", np.shape(shap_values_2d))
                 st.write("First few elements of shap_values:", shap_values_2d[:3])
 
