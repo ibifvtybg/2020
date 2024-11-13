@@ -210,6 +210,7 @@ def predict():
 
         # 根据预测结果生成建议
         probability = predicted_proba[predicted_class] * 100
+        probability_str = " ".join([f"{category_mapping[i]}: {predicted_proba[i]*100:.1f}%" for i in range(len(category_mapping))])
         advice = {
                     '严重污染': f"根据我们的库，该日空气质量为严重污染。模型预测该日为严重污染的概率为 {probability:.1f}%。建议采取防护措施，减少户外活动。",
                     '重度污染': f"根据我们的库，该日空气质量为重度污染。模型预测该日为重度污染的概率为 {probability:.1f}%。建议减少外出，佩戴防护口罩。",
@@ -218,7 +219,8 @@ def predict():
                     '良': f"根据我们的库，此日空气质量为良。模型预测此日空气质量为良的概率为 {probability:.1f}%。可以正常进行户外活动。",
                     '优': f"根据我们的库，该日空气质量为优。模型预测该日空气质量为优的概率为 {probability:.1f}%。空气质量良好，尽情享受户外时光。",
         }[category_mapping[predicted_class]]
-        st.markdown(f"<div class='advice-text'>{advice}</div>", unsafe_allow_html=True)
+        result_text = f"预测类别：{category_mapping[predicted_class]}<br>概率：{probability_str}<br>{advice}"
+        st.markdown(f"<div class='advice-text'>{result_text}</div>", unsafe_allow_html=True)
 
         # 计算 SHAP 值
         explainer = shap.TreeExplainer(model)
