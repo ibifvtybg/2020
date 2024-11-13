@@ -128,7 +128,7 @@ if st.button("预测"):
                         shap_value_param = np.array([shap_value_param])
 
                         # 根据错误提示修改这里，确保传递给waterfall函数的是符合要求的参数
-                        shap_exp = shap.Explanation(shap_value_param,base_value=base_value_param,data=data_param)
+                        shap_exp = shap.Explanation(shap_value_param,base_value=explainer.expected_value,data=data_param)
                         if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
                             # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_属性来大致判断）
                             if model.n_classes_ > 1:
