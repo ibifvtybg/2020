@@ -129,7 +129,7 @@ if st.button("预测"):
                     # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
                     if 0 <= predicted_class < shap_values.shape[1] - 1:
                         sample_idx = 0
-                        class_idx = predicted_class + 1
+                        class_idx = predicted_class 
 
                         shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
                         shap.plots.waterfall(shap_exp)
