@@ -115,7 +115,7 @@ if st.button("预测"):
 
                     st.write("First few elements of shap_values:", shap_values_2d[:3])
 
-                    # 获取base_value
+                    # 获取base_value（通过解释器计算得到）
                     base_value = explainer.expected_value
 
                     # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
@@ -127,10 +127,16 @@ if st.button("预测"):
                         data_param = pd.DataFrame([feature_values], columns=feature_names)
                         shap_value_param = np.array([shap_value_param])
 
-                        # 根据错误提示修改这里，确保传递给waterfall函数的是符合要求的参数
-                        shap_exp = shap.Explanation(shap_value_param,base_value=explainer.expected_value,data=data_param)
+                        # 创建SHAP解释对象，不再显式传递base_value参数
+                        shap_exp = shap.Explanation(
+                            values=shap_value_param,
+                            data=data_param,
+                            feature_names=feature_names
+                        )
+
+                        # 根据模型类型确定用于绘制瀑布图的SHAP值
                         if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
-                            # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_属性来大致判断）
+                            # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_）
                             if model.n_classes_ > 1:
                                 shap_plot_values = shap_values[0, 0]
                             else:
@@ -143,7 +149,7 @@ if st.button("预测"):
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                         except Exception as e:
-                            st.write(f"绘制瀑布图过程中出现错误：{e}")
+                        st.write(f"绘制瀑布图过程中出现错误：{e}")
                     else:
                         st.write("指定的类别索引超出范围，请检查预测类别值。")
                 except Exception as e:
