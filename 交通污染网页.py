@@ -289,6 +289,8 @@ def predict():
             # 在每个条形上显示数值
             plt.text(prev_contributions[i] + contributions_sorted[i] / 2, i, f"{contributions_sorted[i]:.2f}", 
                     ha='center', va='center', fontsize=10, fontproperties=font_prop, color='black')
+            
+        plt.rcParams.update({'font.size': 'default'})
 
         # 设置图表属性
         plt.title(f'预测类型为{predicted_class_name}时的特征贡献度瀑布图', fontsize=40, fontproperties=font_prop)
