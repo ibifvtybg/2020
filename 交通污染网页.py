@@ -85,12 +85,12 @@ if st.button("预测"):
                     advice = (
                         f"根据我们的库，该日空气质量为轻度污染。"
                         f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
-                        "可以适当进行户外活动，但仍需爱你防护。"
+                        "可以适当进行户外活动，但仍需注意防护。"
                     )
                 elif predicted_class == 1:
                     advice = (
                         f"根据我们的库，此日空气质量为良。"
-                        f"模型预测此日空气质量为良的概率为 {probiciency:.1f}%。"
+                        f"模型预测此日空气质量为良的概率为 {probability:.1f}%。"
                         "可以正常进行户外活动。"
                     )
                 else:
@@ -132,13 +132,16 @@ if st.button("预测"):
                         class_idx = predicted_class 
 
                         shap_exp = shap.Explanation(shap_values[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
-                        shap.plots.waterfall(shap_exp)
-                        plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
-                        st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                        try:
+                            shap.plots.waterfall(shap_exp)
+                            plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
+                            st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
+                        except Exception as e:
+                            st.write(f"绘制瀑布图过程中出现错误：{e}")
                     else:
                         st.write("指定的类别索引超出范围，请检查预测类别值。")
                 except Exception as e:
-                    st.write("无法计算 SHAP 值。")
+                    st.write(f"SHAP值计算过程中出现错误：{e}")
             except Exception as e:
                 st.write(f"预测过程中出现错误：{e}")
         else:
