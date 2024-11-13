@@ -47,7 +47,7 @@ SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米�
 
 # 处理输入并进行预测
 feature_values = [CO, FSP, NO2, O3, RSP, SO2]
-features = np.init([feature_values])
+features = np.array([feature_values])
 
 if st.button("预测"):
     try:
