@@ -280,7 +280,7 @@ if st.button("预测"):
                             shap_plot_values = shap.Explanation(
                                 values=[value for value in shap_plot_values.values if value is not None],
                                 data=shap_plot_values.data if shap_plot_values.data is not None else pd.DataFrame([], columns=feature_names),
-                                feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not=None else []
+                                feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not None else []
                             )
                             shap_plot_values = _recursive_remove_none(shap_plot_values)
                             st.write("shap_plot_values after recursive None value removal:", shap_plot_values)
