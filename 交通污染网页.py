@@ -47,7 +47,7 @@ SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米�
 
 # 处理输入并进行预测
 feature_values = [CO, FSP, NO2, O3, RSP, SO2]
-features = np.array([feature_values])
+features = np.init([feature_values])
 
 if st.button("预测"):
     try:
@@ -82,11 +82,11 @@ if st.button("预测"):
                         f"敏感人群应减少户外活动。"
                     )
                 elif predicted_class == 2:
-                    advice = (
-                        f"根据我们的库，该日空气质量为轻度污染。"
-                        f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
-                        "可以适当进行户外活动，但仍需注意防护。"
-                    )
+                advice = (
+                    f"根据我们的库，该日空气质量为轻度污染。"
+                    f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
+                    "可以适当进行户外活动，但仍需注意防护。"
+                )
                 elif predicted_class == 1:
                     advice = (
                         f"根据我们的库，此日空气质量为良。"
@@ -123,9 +123,19 @@ if st.button("预测"):
                         sample_idx = 0
                         class_idx = predicted_class 
 
+                        # 根据错误提示修改这里，确保传递给waterfall函数的是符合要求的参数
                         shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx],base_value[sample_idx],data=pd.DataFrame([feature_values], columns=feature_names))
+                        if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
+                            # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_属性来大致判断）
+                            if model.n_classes_ > 1:
+                                shap_plot_values = shap_values[0, 0]
+                            else:
+                                shap_plot_values = shap_values[0]
+                        else:
+                            shap_plot_values = shap_exp
+
                         try:
-                            shap.plots.waterfall(shap_exp)
+                            shap.plots.waterfall(shap_plot_values)
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                         except Exception as e:
