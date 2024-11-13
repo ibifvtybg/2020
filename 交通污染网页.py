@@ -122,6 +122,9 @@ if st.button("预测"):
                     if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
                         sample_idx = 0
                         class_idx = predicted_class 
+                        shap_value_param = shap_values_2d[sample_idx][class_idx]
+                        base_value_param = base_value[sample_idx]
+                        data_param = pd.DataFrame([feature_values], columns=feature_names)
                         st.write("shap_value_param type:", type(shap_value_param))
                         st.write("shap_value_param value:", shap_value_param)
                         st.write("base_value_param type:", type(base_value_param))
