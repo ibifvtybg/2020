@@ -20,44 +20,44 @@ plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 # 添加蓝色主题的CSS样式，修复背景颜色问题
 st.markdown("""
     <style>
-   .main {
+  .main {
         background-color: #007BFF;
         background-image: url('https://www.transparenttextures.com/patterns/light_blue_fabric.png');
         color: #ffffff;
         font-family: 'Arial', sans-serif;
     }
-   .title {
+  .title {
         font-size: 48px;
         color: #808080;
         font-weight: bold;
         text-align: center;
         margin-bottom: 30px;
     }
-   .subheader {
+  .subheader {
         font-size: 28px;
         color: #99CCFF;
         margin-bottom: 25px;
         text-align: center;
         border-bottom: 2px solid #80BFFF;
-        padding-bottom: 10px;
-        margin-top: 20px;
+        padding_bottom: 10px;
+        margin_top: 20px;
     }
-   .input-label {
+  .input-label {
         font-size: 18px;
-        font-weight: bold;
+        font_weight: bold;
         color: #ADD8E6;
-        margin-bottom: 10px;
+        margin_bottom: 10px;
     }
-   .footer {
+  .footer {
         text-align: center;
-        margin-top: 50px;
-        font-size: 16px;
+        margin_top: 50px;
+        font_size: 16px;
         color: #D8BFD8;
         background-color: #0056b3;
         padding: 20px;
-        border-top: 1px solid #6A5ACD;
+        border_top: 1px solid #6A5ACD;
     }
-   .button {
+  .button {
         background-color: #0056b3;
         border: none;
         color: white;
@@ -65,43 +65,43 @@ st.markdown("""
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        font-size: 18px;
+        font_size: 18px;
         margin: 20px auto;
         cursor: pointer;
         border-radius: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-        transition: background-color 0.3s, box-shadow 0.3s;
+        box_shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+        transition: background-color 0.3s, box_shadow 0.3s;
     }
-   .button:hover {
+  .button:hover {
         background-color: #003366;
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.7);
+        box_shadow: 0px 6px 10px rgba(0, 0, 0, 0.7);
     }
-   .stSelectbox,.stNumberInput,.stSlider {
-        margin-bottom: 20px;
+  .stSelectbox,.stNumberInput,.stSlider {
+        margin_bottom: 20px;
     }
-   .stSlider > div {
+  .stSlider > div {
         padding: 10px;
         background: #E6E6FA;
         border-radius: 10px;
     }
-   .prediction-result {
-        font-size: 24px;
+  .prediction-result {
+        font_size: 24px;
         color: #ffffff;
-        margin-top: 30px;
+        margin_top: 30px;
         padding: 20px;
         border-radius: 10px;
         background: #4682B4;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+        box_shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
     }
-   .advice-text {
-        font-size: 20px;
-        line-height: 1.6;
+  .advice-text {
+        font_size: 20px;
+        line_height: 1.6;
         color: #ffffff;
         background: #5DADE2;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-        margin-top: 15px;
+        box_shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+        margin_top: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -136,49 +136,61 @@ category_mapping = {
 st.markdown('<div class="subheader">请填写以下信息以进行交通污染预测：</div>', unsafe_allow_html=True)
 
 # 一氧化碳浓度
-CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+CO = st.number_input("一氧化碳的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的一氧化碳在24小时内的平均浓度值，单位为毫克每立方米。")
 if CO is None:
     st.warning("一氧化碳浓度输入为空，已将其从本次预测数据中删除。")
-    CO = 0.0
+    CO = 0
+else:
+    CO = int(CO)
 
 # PM2.5浓度
-FSP = st.number_input("PM2.5的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+FSP = st.number_input("PM2.5的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的PM2.5在24小时内的平均浓度值，单位为毫克每立方米。")
 if FSP is None:
     st.warning("PM2.5浓度输入为空，已将其从本次预测数据中删除。")
-    FSP = 0.0
+    FSP = 0
+else:
+    FSP = int(FSP)
 
 # 二氧化氮浓度
-NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+NO2 = st.number_input("二氧化氮的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的二氧化氮在24小时内的可平均浓度值，单位为毫克每立方米。")
 if NO2 is None:
     st.warning("二氧化氮浓度输入为空，已将其从本次预测数据中删除。")
-    NO2 = 0.0
+    NO2 = 0
+else:
+    NO2 = int(NO2)
 
 # 臭氧浓度
-O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+O3 = st.number_input("臭氧的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
 if O3 is None:
-    st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。", min_value=0.0, value=0.0,
+    st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。", min_value=0, value=0,
                     help="请输入该监测站检测到的臭氧在24小时内的平均浓度值，单位为毫克每立方米。")
 if O3 is None:
     st.warning("臭氧浓度输入为空，已将其从本次预测数据中删除。")
-    O3 = 0.0
+    O3 = 0
+else:
+    O3 = int(O3)
 
 # PM10浓度
-RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+RSP = st.number_input("PM10的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的PM10在24小时内的平均浓度值，单位为毫克每立方米。")
 if RSP is None:
     st.warning("PM10浓度输入为空，已将其从本次预测数据中删除。")
-    RSP = 0.0
+    RSP = 0
+else:
+    RSP = int(RSP)
 
 # 二氧化硫浓度
-SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米）：", min_value=0.0, value=0.0,
+SO2 = st.number_input("二氧化硫的24小时平均浓度（毫克每立方米）：", min_value=0, value=0,
                     help="请输入该监测站检测到的二氧化硫在24小时内的平均浓度值，单位为毫克每立方米。")
 if SO2 is None:
     st.warning("二氧化硫浓度输入为空，已将其从本次预测数据中删除。")
-    SO2 = 0.0
+    SO2 = 0
+else:
+    SO2 = int(SO2)
 
 def predict():
     try:
@@ -189,12 +201,12 @@ def predict():
 
         # 获取用户输入并构建特征数组
         user_inputs = {
-            "CO": float(CO),
-            "FSP": float(FSP),
-            "NO2": float(NO2),
-            "O3": float(O3),
-            "RSP": float(RSP),
-            "SO2": float(SO2)
+            "CO": CO,
+            "FSP": FSP,
+            "NO2": NO2,
+            "O3": O3,
+            "RSP": RSP,
+            "SO2": SO2
         }
 
         feature_values = [user_inputs[feature] for feature in model_input_features]
@@ -209,7 +221,7 @@ def predict():
 
         # 根据预测结果生成建议
         probability = predicted_proba[predicted_class] * 100
-        probability_str = " ".join([f"{category_mapping[i]}: {predicted_proba[i]*100:.1f}%" for i in range(len(category_mapping))])
+        probability_str = " ".join([f"{category_mapping[i]}: {predified_proba[i]*100:.1f}%" for i in range(len(category_mapping))])
         advice = {
                     '严重污染': f"建议：根据我们的库，该日空气质量为严重污染。模型预测该日为严重污染的概率为 {probability:.1f}%。建议采取防护措施，减少户外活动。",
                     '重度污染': f"建议：根据我们的库，该日空气质量为重度污染。模型预测该日为重度污染的概率为 {probability:.1f}%。建议减少外出，佩戴防护口罩。",
@@ -225,17 +237,12 @@ def predict():
         # 计算 SHAP 值
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(features_array)
-        shap_values = shap_values.astype(np.float32)
 
         # 计算每个类别的特征贡献度
         importance_df = pd.DataFrame()
         for i in range(shap_values.shape[2]):  # 对每个类别进行计算
-            sliced_shap_values = shap_values[:, :, i]
-            if not isinstance(sliced_shap_values, np.ndarray) or sliced_shap_values.ndim!= 2:
-                st.write(f"<div style='color: red;'>切片后的SHAP值数据格式不符合预期，应为二维数组，当前类型为：{type(sliced_shap_values)}，维度为：{sliced_shap_values.ndim}</div>", unsafe_allow_html=True)
-                return
             importance = np.abs(shap_values[:, :, i]).mean(axis=0)
-            importance_df[f'Class_{i}'] = importance
+            importance_df[f'Class_{i}'] = int(importance)
 
         importance_df.index = model_input_features
 
@@ -264,7 +271,7 @@ def predict():
             "SO2": "二氧化硫浓度"
         }
         features = [feature_name_mapping[f] for f in importances.index.tolist()]  # 获取特征名称
-        contributions = importances.values  # 获取特征贡献度
+        contributions = importances.values
 
         # 确保瀑布图的数据是按贡献度绝对值降序排列的
         sorted_indices = np.argsort(np.abs(contributions))[::-1]
@@ -284,8 +291,6 @@ def predict():
 
         # 绘制瀑布图
         for i in range(len(contributions_sorted)):
-            if contributions_sorted[i] > 100 or contributions_sorted[i] < -100:
-                contributions_sorted[i] = np.clip(contributions_sorted[i], -100, 100)
             color = '#ff5050' if contributions_sorted[i] < 0 else '#66b3ff'  # 负贡献使用红色，正贡献使用蓝色
             if i == len(contributions_sorted) - 1:
                 # 最后一个条形带箭头效果，表示最终累积值
@@ -294,7 +299,7 @@ def predict():
                 ax.barh(features_sorted[i], contributions_sorted[i], left=prev_contributions[i], color=color, edgecolor='black', height=0.5)
 
             # 在每个条形上显示数值
-            plt.text(prev_contributions[i] + contributions_sorted[i] / 2, i, f"{contributions_sorted[i]:.2f}", 
+            plt.text(prev_contributions[i] + contributions_sorted[i] / 2, i, f"{int(contributions_sorted[i]):.2f}", 
                     ha='center', va='center', fontsize=10, fontproperties=font_prop, color='black')
 
         # 设置图表属性
@@ -323,5 +328,4 @@ if st.button("预测", key="predict_button"):
 
 # 页脚
 st.markdown('<div class="footer">© 2024 All rights reserved.</div>', unsafe_allow_html=True)
-
 st.markdown("</div>", unsafe_allow_html=True)
