@@ -126,7 +126,7 @@ expected_feature_count = len(model_input_features)
 category_mapping = {
     5: '严重污染',
     4: '重度污染',
-    3: '重度污染',
+    3: '中度污染',
     2: '轻度污染',
     1: '良',
     0: '优'
@@ -238,7 +238,7 @@ def predict():
         type_mapping = {
              5: '严重污染',
              4: '重度污染',
-             3: '重度污染',
+             3: '中度污染',
              2: '轻度污染',
              1: '良',
              0: '优'
