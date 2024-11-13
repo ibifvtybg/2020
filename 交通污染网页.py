@@ -151,8 +151,8 @@ if st.button("预测"):
                     base_value = explainer.expected_value
                     st.write("base_value after calculation:", base_value)
                     if base_value is None:
-                        st.error("计算得到的base_value为None，请检查模型或数据！")
-                        raise ValueError("base_value不能为None。")
+                    st.error("计算得到的base_value为None，请检查模型或数据！")
+                    raise ValueError("base_value不能为None。")
 
                     # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
                     if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
@@ -184,8 +184,9 @@ if st.button("预测"):
                                 )
                         else:
                             shap_plot_values = shap_exp
-                            # 这里可以添加一些检查确保shap_exp的有效性，比如
-                            if not isinstance(shap_exp, shap.Explanation):
+                            if shap_exp is None:
+                                st.error("shap_exp未定义，请检查相关代码！")
+                            elif not isinstance(shap_exp, shap.Explanation):
                                 raise ValueError("shap_exp is not a  valid shap.Explanation object!")
 
                         # 检查并删除shap_plot_values中可能存在的None值
@@ -210,21 +211,27 @@ if st.button("预测"):
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                         except TypeError as e:
-                            st.write(f"绘制瀑布图时发生类型错误：{e}")
+                            st.error(f"绘制瀑布图时发生类型错误：{e}")
+                            raise
                         except ValueError as e:
-                            st.write(f"绘制瀑布图时发生值错误：e")
+                            st.error(f"绘制瀑布图时发生值错误：{e}")
+                            raise
                         except Exception as e:
-                            st.write(f"绘制瀑布图过程中出现其他未分类错误：e")
+                            st.error(f"绘制瀑布图过程中出现其他未分类错误：{e}")
+                            raise
                     else:
                         st.write("指定的类别索引超出范围，请检查预测类别值。")
                 except Exception as e:
-                    st.write(f"SHAP值计算过程中出现错误：e")
+                    st.error(f"SHAP值计算过程中出现错误：{e}")
+                    raise
             except Exception as e:
-                st.write(f"预测过程中出现错误：e")
+                st.error(f"预测过程中出现错误：{e}")
+                raise
         else:
             st.write("模型加载失败，无法进行预测。")
     except Exception as e:
-        st.write(f"整个预测相关操作出现错误：e")
+        st.error(f"整个预测相关操作出现错误：{e}")
+        raise
 
 
 def _recursive_remove_none(data):
