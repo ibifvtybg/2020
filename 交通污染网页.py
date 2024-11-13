@@ -136,11 +136,11 @@ if st.button("预测"):
                     st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                 else:
                     st.write("指定的类别索引超出范围，请检查预测类别值。")
-                else:
-                    st.write("无法计算 SHAP 值。")
-            except Exception as e:
-                st.write(f"SHAP 值计算过程中出现错误：{e}")
+            else:
+                st.write("无法计算 SHAP 值。")
         except Exception as e:
-            st.write(f"预测过程中出现错误：{e}")
-    else:
-        st.write("模型加载失败，无法进行预测。")
+            st.write(f"SHAP 值计算过程中出现错误：{e}")
+    except Exception as e:
+        st.write(f"预测过程中出现错误：{e}")
+else:
+    st.write("模型加载失败，无法进行预测。")
