@@ -230,10 +230,10 @@ def predict():
         # 计算每个类别的特征贡献度
         importance_df = pd.DataFrame()
         for i in range(shap_values.shape[2]):  # 对每个类别进行计算
-        sliced_shap_values = shap_values[:, :, i]
-        if not isinstance(sliced_shap_values, np.ndarray) or sliced_shap_values.ndim!= 2:
-            st.write(f"<div style='color: red;'>切片后的SHAP值数据格式不符合预期，应为二维数组，当前类型为：{type(sliced_shap_values)}，维度为：{sliced_shap_values.ndim}</div>", unsafe_allow_html=True)
-            return
+            sliced_shap_values = shap_values[:, :, i]
+            if not isinstance(sliced_shap_values, np.ndarray) or sliced_shap_values.ndim!= 2:
+                st.write(f"<div style='color: red;'>切片后的SHAP值数据格式不符合预期，应为二维数组，当前类型为：{type(sliced_shap_values)}，维度为：{sliced_shap_values.ndim}</div>", unsafe_allow_html=True)
+                return
             importance = np.abs(shap_values[:, :, i]).mean(axis=0)
             importance_df[f'Class_{i}'] = importance
 
