@@ -145,8 +145,8 @@ if st.button("预测"):
                     # 获取base_value（通过解释器计算得到）
                     base_value = explainer.expected_value
                     if base_value is None:
-                    st.error("计算得到的base_value为None，请检查模型或数据！")
-                    raise ValueError("base_value不能为None。")
+                        st.error("计算得到的base_value为None，请检查模型或数据！")
+                        raise ValueError("base_value不能为None。")
 
                     # 只绘制第一个样本（索引为0）的第predicted_class + 1个类别
                     if 0 <= predicted_class < shap_values_2d.shape[1] - 1:
