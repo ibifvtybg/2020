@@ -22,8 +22,7 @@ if isinstance(model, xgb.XGBClassifier):
     model.set_params(booster='gbtree')
 
 # 定义特征名称
-feature_names = ['CO', 'FSHAP值计算过程中出现错误：float() argument must be a string or a real number, not 'NoneType'P', 'NO2', 'O3', 'RSP', 'SO2']
-
+feature_names = ["CO", "FSHAP值计算过程中出现错误：float() argument must be a string or a real number, not 'NoneType'P", "NO2", "O3", "RSP", "SO2"]
 # Streamlit 用户界面
 st.title("五角场监测站交通污染预测")
 
