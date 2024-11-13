@@ -215,7 +215,7 @@ if st.button("预测"):
                                     else:
                                         shap_values_for_plot = shap_values[0]
                                         if shap_values_for_plot is None:
-                                            st.error("在获取用于绘制瀑布图的SHAP值（单输出模型情况）时得到了No- 1:
+                                            st.error("在获取用于绘制瀑布图的SHAP值（单输出模型情况）时得到了None值，请检查模型或数据！")
                                 sample_idx = 0
                                 class_idx = predicted_class 
                                 shap_value_param = shap_values_2d[sample_idx][class_idx]
