@@ -149,7 +149,7 @@ if st.button("预测"):
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                         except Exception as e:
-                        st.write(f"绘制瀑布图过程中出现错误：{e}")
+                            st.write(f"绘制瀑布图过程中出现错误：{e}")
                     else:
                         st.write("指定的类别索引超出范围，请检查预测类别值。")
                 except Exception as e:
