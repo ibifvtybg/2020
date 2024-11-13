@@ -66,6 +66,7 @@ if SO2 is None:
 # 处理输入并进行预测
 feature_values = [CO, FSP, NO2, O3, RSP, SO2]
 features = np.array([feature_values])
+st.write("feature_values after input processing:", feature_values)
 
 if st.button("预测"):
     try:
@@ -74,6 +75,8 @@ if st.button("预测"):
             try:
                 predicted_class = model.predict(features)[0]
                 predicted_proba = model.predict_proba(features)[0]
+                st.write("predicted_class:", predicted_class)
+                st.write("predicted_proba:", predicted_proba)
 
                 # 检查预测概率是否包含None值
                 if any(p is None for p in predicted_proba):
@@ -106,9 +109,9 @@ if st.button("预测"):
                     )
                 elif predicted_class == 2:
                     advice = (
-                        f"根据我们的库，该日空气质量为轻度污染。"
+                        f"根据我们的的库，该日空气质量为轻度污染。"
                         f"模型预测该日为轻度污染的概率为 {probability:.1f}%。"
-                        "可以适当进行户外活动，但仍需注意防护。"
+                        "可以适当进行户外活动，但仍需以注意防护。"
                     )
                 elif predicted_class == 1:
                     advice = (
@@ -129,14 +132,16 @@ if st.button("预测"):
                 try:
                     explainer = shap.TreeExplainer(model)
                     shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
+                    st.write("shap_values after calculation:", shap_values)
 
                     # 检查并删除shap_values中可能存在的None值
                     if shap_values is not None:
                         shap_values = np.array([value for value in shap_values if value is not None])
+                    st.write("shap_values after None value removal:", shap_values)
 
                     st.write("Shape of shap_values:", np.shape(shap_values))
                     shap_values_2d = np.squeeze(shap_values, axis=0)
-                    st.write("Shape of shap_values_2d:", np.shape(shap_values_2d))
+                    st.write("shap_values_2d after squeezing:", shap_values_2d)
 
                     st.write("SHAP values for the first class:")
                     st.write(shap_values[0, 0, :])
@@ -145,6 +150,7 @@ if st.button("预测"):
 
                     # 获取base_value（通过解释器计算得到）
                     base_value = explainer.expected_value
+                    st.write("base_value after calculation:", base_value)
                     if base_value is None:
                         st.error("计算得到的base_value为None，请检查模型或数据！")
                         raise ValueError("base_value不能为None。")
@@ -163,6 +169,7 @@ if st.button("预测"):
                             # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_）
                             if model.n_classes_ > 1:
                                 shap_values_for_plot = shap_values[0, 0]
+                                st.write("shap_values_for_plot before None value check:", shap_values_for_plot)
                                 if shap_values_for_plot is None:
                                     st.error("在获取用于绘制瀑布图的SHAP值（多输出模型情况）时得到了None值，请检查模型或 数据！")
                                     raise ValueError("shap_values_for_plot不能为None。")
@@ -178,14 +185,15 @@ if st.button("预测"):
                                 )
                             else:
                                 shap_values_for_plot = shap_values[0]
+                                st.write("shap_values_for_plot before None value check:", shap_values_for_plot)
                                 if shap_values_for_plot is None:
                                     st.error("在获取用于绘制瀑布图的SHAP值（单输出模型情况）时得到了None值，请检查模型或数据！")
                                     raise ValueError("shap_values_for_plot不能为None。")
                                 else:
-                                    # 检查切片内每个元素是否为None
-                                    if any(value is None for value in shap_values_for_plot):
-                                        st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
-                                        raise ValueError("shap_values_for_plot元素不能为None。")
+                                # 检查切片内每个元素是否为None
+                                if any(value is None for value in shap_values_for_plot):
+                                    st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
+                                    raise ValueError("shap_values_for_plot元素不能为None。")
                                 shap_plot_values = shap.Explanation(
                                     values=shap_values_for_plot,
                                     data=pd.DataFrame([feature_values], columns=feature_names),
@@ -200,10 +208,63 @@ if st.button("预测"):
                         # 检查并删除shap_plot_values中可能存在的None值
                         if shap_plot_values is not None:
                             shap_plot_values = shap.Explanation(
+                                values=[value for value in shap_plot_values.values if value is  - 1:
+                                sample_idx = 0
+                                class_idx = predicted_class 
+                                shap_value_param = shap_values_2d[sample_idx][class_idx]
+                                base_value_param = base_value[sample_idx]
+                                data_param = pd.DataFrame([feature_values], columns=feature_names)
+                                shap_value_param = np.array([shap_value_param])
+
+                                # 根据模型类型确定用于绘制瀑布图的SHAP值及创建正确的Explanation对象
+                                if isinstance(model, xgb.XGBClassifier) and hasattr(model, 'n_classes_'):
+                                    # 对于多输出模型（这里判断是否是XGBClassifier且有n_classes_）
+                                    if model.n_classes_ > 1:
+                                        shap_values_for_plot = shap_values[0, 0]
+                                        st.write("shap_values_for_plot before None value check:", shap_values_for_plot)
+                                        if shap_values_for_plot is None:
+                                            st.error("在获取用于绘制瀑布图的SHAP值（多输出模型情况）时得到了None值，请检查模型或 数据！")
+                                            raise ValueError("shap_values_for_plot不能为None。")
+                                        else:
+                                            # 检查切片内每个元素是否为None
+                                            if any(value is None for value in shap_values_for_plot):
+                                                st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
+                                                raise ValueError("shap_values_for_plot元素不能为None。")
+                                        shap_plot_values = shap.Explanation(
+                                            values=shap_values_for_plot,
+                                            data=pd.DataFrame([feature_values], columns=feature_names),
+                                            feature_names=feature_names
+                                        )
+                                    else:
+                                        shap_values_for_plot = shap_values[0]
+                                        st.write("shap_values_for_plot before None value check:", shap_values_for_plot)
+                                        if shap_values_for_plot is None:
+                                            st.error("在获取用于绘制瀑布图的SHAP值（单输出模型情况）时得到了None值，请检查模型或数据！")
+                                            raise ValueError("shap_values_for_plot不能为None。")
+                                        else:
+                                            # 检查切片内每个  - 1:
+                                            if any(value is None for value in shap_values_for_plot):
+                                                st.error("用于绘制瀑布图的SHAP值切片内包含None值，请检查模型或数据！")
+                                                raise ValueError("shap_values_for_plot元素不能为None。")
+                                        shap_plot_values = shap.Explanation(
+                                            values=shap_values_for_plot,
+                                            data=pd.DataFrame([feature_values], columns=feature_names),
+                                            feature_names=feature_names
+                                        )
+                                else:
+                                    shap_plot_values = shap_exp
+                                    # 这里可以添加一些检查确保shap_exp的有效性，比如
+                                    if not isinstance(shap_exp, shap.Explanation):
+                                        raise ValueError("shap_exp is not a  valid shap.Explanation object!")
+
+                        # 检查并删除shap_plot_values中可能存在的None值
+                        if shap_plot_values is not None:
+                            shap_plot_values = shap.Explanation(
                                 values=[value for value in shap_plot_values.values if value is not None],
                                 data=shap_plot_values.data if shap_plot_values.data is not None else pd.DataFrame([], columns=feature_names),
                                 feature_names=shap_plot_values.feature_names if shap_plot_values.feature_names is not None else []
                             )
+                            st.write("shap_plot_values after None value removal:", shap_plot_values)
 
                         # 检查data属性对应的DataFrame内是否有None值
                         if shap_plot_values.data is not None:
