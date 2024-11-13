@@ -136,7 +136,7 @@ if st.button("预测"):
                     st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                 else:
                     st.write("指定的类别索引超出范围，请检查预测类别值。")
-            else:
+            except Exception as e:
                 st.write("无法计算 SHAP 值。")
         except Exception as e:
             st.write(f"SHAP 值计算过程中出现错误：{e}")
