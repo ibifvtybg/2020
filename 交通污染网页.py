@@ -124,9 +124,9 @@ if st.button("预测"):
                         sample_idx = 0
                         class_idx = predicted_class 
 
-                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx], base_value[sample_idx], data=pd.DataFrame([feature_values], columns=feature_names))
+                        shap_exp = shap.Explanation(shap_values_2d[sample_idx][class_idx],base_value[sample_idx],data=pd.DataFrame([feature_values], columns=feature_names))
                         try:
-                            shap.plots.waterfall(shap_values[0, predicted_class])
+                            shap.plots.waterfall(shap_exp)
                             plt.savefig(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png", bbox_inches='tight', dpi=1200)
                             st.image(f"shap_waterfall_plot_{sample_idx}_{class_idx}.png")
                         except Exception as e:
