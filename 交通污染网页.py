@@ -122,6 +122,8 @@ if st.button("预测"):
                 st.write("Shape of shap_values:", np.shape(shap_values_2d))
                 st.write("First few elements of shap_values:", shap_values_2d[:3])
 
+                base_value = explainer.expected_value
+
                 # 针对每个样本和每个类别分别绘制瀑布图
                 for sample_idx in range(shap_values.shape[0]):
                     for class_idx in range(shap_values.shape[1]):
